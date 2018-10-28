@@ -6,7 +6,7 @@ const url = require('url');
 // Firestore API
 const firestore = new Firestore({timestampsInSnapshots: true});
 
-exports.karma_playerhandler = function(request, response) {
+exports.karma_gamehandler = function(request, response) {
     if (request.method === "OPTIONS") {
         console.log('origins')
         response.set('Access-Control-Allow-Origin', "*")
@@ -20,22 +20,41 @@ exports.karma_playerhandler = function(request, response) {
         let url_parts = url.parse(request.url, true);
         let query = url_parts.query;
         console.log('Query : ', query)
-        // if (query.id) {
-        //     const docPath = `players/${query.id}`
-        //     console.log('Docpath = ', docPath)
-        //     try {
-        //         firestore.doc(docPath).get().then( player => {
-        //             if (player.exists) {
-        //                 response.status(200).json(player.data())
-        //             } else {
-        //                 response.status(404).json({error: "No such player"})
-        //             }
-        //         }, err => {
-        //             response.status(500).json(err)
-        //         })
-        //     } catch (err) {
-        //         response.status(500).json(err)
-        //     }
+        if (query.create && query.name && query.playerId) {
+            const gameId = uuid()
+            const playerId = query.playerId
+            const name = query.name
+            const created = moment().valueOf()
+            const deckId = '1'
+            const game = {
+                name: name,
+                id: gameId,
+                created: created,
+                players: [playerId],
+                active: false,
+                deck: deckId,
+                hands: {}                
+            }
+            game.hands[playerId] = {0 : 'S13'}
+
+            const docPath = `games/${gameId}`
+            console.log('Docpath = ', docPath)
+            try {
+                firestore.doc(docPath).set().then( ref => {
+                    const retGame = {
+                        id: gameId, 
+                        name: name, 
+                        active: game.active, 
+                        hand: game.hands[playerId]
+                    }
+                    response.status(200).json({dbResponse: ref, game: retGame})
+                }, err => {
+                    console.log(err)
+                    response.status(500).json(err)
+                })
+            } catch (err) {
+                response.status(500).json(err)
+            }
         // } else if (query.new && query.name) {
         //     const playerId = uuid()
         //     const created = moment().valueOf()
@@ -47,7 +66,10 @@ exports.karma_playerhandler = function(request, response) {
         //     firestore.collection('players').doc(playerId).set(player).then( ref => {
         //         response.status(200).json({dbResponse: ref, player: player})
         //     })
-        // }
-        response.status(200).send()
+        } else {
+            response.status(200).send()
+        }
+    } else {
+        response.status(403).send()
     }
 }

@@ -48,5 +48,7 @@ exports.karma_playerhandler = function(request, response) {
                 response.status(200).json({dbResponse: ref, player: player})
             })
         }
+    } else {
+        response.status(403).send()
     }
 }

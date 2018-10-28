@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "deploy": "gcloud functions deploy karma_gamehandler --runtime nodejs8 --trigger-http",
+    "create": "curl -i -H \"Accept: application/json\" -H \"Content-Type: application/json\" -X GET \"https://us-central1-karma-game.cloudfunctions.net/karma_gamehandler?create=true&name=bobgame&playerId=47806d6d-3fc6-4bd1-83a2-8bb0c352b7fc\""
   },
   "author": "",
   "license": "ISC",
