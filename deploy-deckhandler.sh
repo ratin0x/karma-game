@@ -1,0 +1,1 @@
+gcloud functions deploy karma_deckhandler --runtime nodejs8 --trigger-http

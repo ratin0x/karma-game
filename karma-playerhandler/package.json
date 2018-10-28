@@ -9,6 +9,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@google-cloud/firestore": "^0.18.0"
+    "@google-cloud/firestore": "^0.18.0",
+    "moment": "^2.22.2",
+    "uuid": "^3.3.2"
   }
 }
