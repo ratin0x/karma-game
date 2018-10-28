@@ -22,54 +22,68 @@ exports.karma_gamehandler = function(request, response) {
         console.log('Query : ', query)
         if (query.create && query.name && query.playerId) {
             const gameId = uuid()
-            const playerId = query.playerId
-            const name = query.name
-            const created = moment().valueOf()
-            const deckId = '1'
-            const game = {
-                name: name,
-                id: gameId,
-                created: created,
-                players: [playerId],
-                active: false,
-                deck: deckId,
-                hands: {}                
-            }
-            game.hands[playerId] = {0 : 'S13'}
-
-            const docPath = `games/${gameId}`
-            console.log('Docpath = ', docPath)
-            try {
-                firestore.doc(docPath).set().then( ref => {
-                    const retGame = {
-                        id: gameId, 
-                        name: name, 
-                        active: game.active, 
-                        hand: game.hands[playerId]
-                    }
-                    response.status(200).json({dbResponse: ref, game: retGame})
-                }, err => {
-                    console.log(err)
-                    response.status(500).json(err)
+            query.gameId = gameId
+            createGame(query).then( ref => {
+                console.log('Created, getting game', gameId)
+                getGame({gameId: gameId}).then(game => {
+                    const fullGameData = game.data()
+                    response.status(200).json({dbResponse: ref, game: fullGameData})
                 })
-            } catch (err) {
+            }, err => {
+                console.log('Error: ',err)
                 response.status(500).json(err)
-            }
-        // } else if (query.new && query.name) {
-        //     const playerId = uuid()
-        //     const created = moment().valueOf()
-        //     const player = {
-        //         id: playerId,
-        //         name: query['name'],
-        //         created: created
-        //     }            
-        //     firestore.collection('players').doc(playerId).set(player).then( ref => {
-        //         response.status(200).json({dbResponse: ref, player: player})
-        //     })
-        } else {
+            })
+        } else if (query.get && query.gameId) {
+            getGame(query).then(game => {
+                const fullGameData = game.data()
+                response.status(200).json({dbResponse: ref, game: fullGameData})
+            })
+        }
+        else {
             response.status(200).send()
         }
     } else {
         response.status(403).send()
     }
+}
+
+function createGame(query) {
+    const gameId = query.gameId
+    const playerId = query.playerId
+    const name = query.name
+    const created = moment().valueOf()
+    const deckId = '1'
+    const game = {
+        name: name,
+        id: gameId,
+        created: created,
+        players: [playerId],
+        active: false,
+        deck: deckId,
+        hands: {}                
+    }
+    game.hands[playerId] = {0 : 'S13'}
+
+    const docPath = `games/${gameId}`
+    console.log('Docpath = ', docPath)
+    try {
+        console.log('Creating game', gameId)
+        return firestore.doc(docPath).set(game)
+    } catch (err) {
+        console.log('Error: ',err)
+        response.status(500).json(err)
+    }    
+}
+
+function getGame(query) {
+    const gameId = query.gameId
+    const docPath = `games/${gameId}`
+    console.log('Docpath = ', docPath)
+    try {
+        console.log('Getting game', gameId)
+        return firestore.doc(docPath).get()
+    } catch (err) {
+        console.log('Error: ',err)
+        response.status(500).json(err)
+    }    
 }
