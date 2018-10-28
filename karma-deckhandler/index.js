@@ -3,7 +3,7 @@ const Firestore = require('@google-cloud/firestore')
 // Firestore API
 const firestore = new Firestore({timestampsInSnapshots: true});
 
-exports.karma_playerhandler = function(request, response) {
+exports.karma_deckhandler = function(request, response) {
     if (request.method === "OPTIONS") {
         console.log('origins')
         response.set('Access-Control-Allow-Origin', "*")
