@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "deploy": "gcloud functions deploy karma_playerhandler --runtime nodejs8 --trigger-http"
+    "deploy": "gcloud functions deploy karma_playerhandler --runtime nodejs8 --trigger-http",
+    "deploy-test": "functions-emulator deploy karma_playerhandler --trigger-http",
+    "create-test": "curl -i -H \"Accept: application/json\" -H \"Content-Type: application/json\" -X GET \"http://localhost:8010/karma-game/us-central1/karma_playerhandler?new=true&name=fred\""
   },
   "author": "",
   "license": "ISC",

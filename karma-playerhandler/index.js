@@ -30,7 +30,7 @@ exports.karma_playerhandler = function(request, response) {
                     } else {
                         response.status(404).json({error: "No such player"})
                     }
-                }, err => {
+                }).catch(err => {
                     response.status(500).json(err)
                 })
             } catch (err) {
